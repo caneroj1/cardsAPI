@@ -21,7 +21,8 @@ type Card struct {
 // when creating a new card.
 func ValidateCard(validator *revel.Validation, cardBody string, cardType, cardBlanks int) {
 	validator.Required(cardBody)
-
+	validator.Range(cardType, 0, 1).Message("The card type can only be 0 for a white card, or 1 for a black card.")
+	validator.Min(cardBlanks, 0).Message("Card blank cannot be negative.")
 	if cardType == 0 {
 		validator.Max(cardBlanks, 0).Message("You cannot have blank spaces in a card unless it is a black card (type = 1)")
 	}

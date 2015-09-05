@@ -25,6 +25,7 @@ func (c Cards) Create(cardBody string, cardType, cardBlanks int) revel.Result {
 	models.ValidateCard(c.Validation, cardBody, cardType, cardBlanks)
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
+		c.Response.Status = 400
 		return c.RenderJson(c.Validation.Errors)
 	}
 
