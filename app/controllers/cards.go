@@ -15,6 +15,11 @@ func (c Cards) Index() revel.Result {
 	return c.RenderJson(models.GetAllCards())
 }
 
+// Classic returns all of the classic cards
+func (c Cards) Classic() revel.Result {
+	return c.RenderJson(models.GetAllClassicCards())
+}
+
 // Show returns the json for a specific card
 func (c Cards) Show(id int64) revel.Result {
 	return c.RenderJson(models.GetCardByID(id))

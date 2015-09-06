@@ -6,6 +6,7 @@ module:testrunner
 
 GET     /                                       App.Index
 GET     /cards                                  Cards.Index
+GET     /cards/classic                          Cards.Classic
 GET     /cards/:id                              Cards.Show
 POST    /card                                   Cards.Create
 

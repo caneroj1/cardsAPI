@@ -51,3 +51,41 @@ func InitDB() {
 
 	log.Println("No errors. Connected to database successfully.")
 }
+
+func getCardsTableName() string {
+	secrets := hush.Hushfile()
+	table, ok := secrets.GetString("table")
+	if !ok {
+		log.Fatal("No table name exists")
+		return ""
+	}
+
+	return table
+}
+
+// QueryRow returns a single row as a result from executing some sql
+func QueryRow(sqlString string, params ...interface{}) *sql.Row {
+	table := getCardsTableName()
+
+	sql := fmt.Sprintf(sqlString, table)
+
+	return Database.QueryRow(sql, params...)
+}
+
+// GetByQuery returns the rows associated with a query that is used to return data
+func GetByQuery(query string, params ...interface{}) *sql.Rows {
+	table := getCardsTableName()
+	var (
+		err  error
+		rows *sql.Rows
+	)
+
+	sql := fmt.Sprintf(query, table)
+	rows, err = Database.Query(sql, params...)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return rows
+}

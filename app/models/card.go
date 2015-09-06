@@ -1,9 +1,7 @@
 package models
 
 import (
-	"fmt"
 	"github.com/caneroj1/cardsAPI/app/database"
-	"github.com/caneroj1/hush"
 	"github.com/revel/revel"
 	"log"
 )
@@ -30,16 +28,10 @@ func ValidateCard(validator *revel.Validation, cardBody string, cardType, cardBl
 
 // SaveCard saves a card to the database and sets its id
 func SaveCard(card Card) Card {
-	secrets := hush.Hushfile()
-	table, ok := secrets.GetString("table")
-	if !ok {
-		panic("No table name exists")
-	}
-
-	sql := fmt.Sprintf("insert into %s (cardbody, cardtype, cardblanks) VALUES ($1, $2, $3) returning id", table)
-
+	sql := "insert into %s (cardbody, cardtype, cardblanks) VALUES ($1, $2, $3) returning id"
 	var id int64
-	err := database.Database.QueryRow(sql, card.CardBody, card.CardType, card.CardBlanks).Scan(&id)
+
+	err := database.QueryRow(sql, card.CardBody, card.CardType, card.CardBlanks).Scan(&id)
 	if err != nil {
 		log.Fatal(err)
 		return card
@@ -49,26 +41,46 @@ func SaveCard(card Card) Card {
 	return card
 }
 
-// GetAllCards returns all of the cards in the db
-func GetAllCards() []Card {
+// GetAllClassicCards returns all of the classic cards in the db
+func GetAllClassicCards() []Card {
 	var cards []Card
-	secrets := hush.Hushfile()
-	table, ok := secrets.GetString("table")
-	if !ok {
-		panic("No table name exists")
-	}
+	var err error
 
-	sql := fmt.Sprintf("select * from %s", table)
-	rows, err := database.Database.Query(sql)
-	if err != nil {
-		log.Fatal(err)
-		return cards
-	}
+	sql := "select * from %s where classic = true"
+	rows := database.GetByQuery(sql)
 	defer rows.Close()
 
 	var card Card
 	for rows.Next() {
-		err := rows.Scan(&card.CardBody, &card.CardType,
+		err = rows.Scan(&card.CardBody, &card.CardType,
+			&card.CardBlanks, &card.Classic, &card.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		cards = append(cards, card)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return cards
+}
+
+// GetAllCards returns all of the cards in the db
+func GetAllCards() []Card {
+	var cards []Card
+	var err error
+
+	sql := "select * from %s"
+	rows := database.GetByQuery(sql)
+	defer rows.Close()
+
+	var card Card
+	for rows.Next() {
+		err = rows.Scan(&card.CardBody, &card.CardType,
 			&card.CardBlanks, &card.Classic, &card.ID)
 		if err != nil {
 			log.Fatal(err)
@@ -87,22 +99,14 @@ func GetAllCards() []Card {
 // GetCardByID gets the cards from the db by id
 func GetCardByID(id int64) Card {
 	var card Card
-	secrets := hush.Hushfile()
-	table, ok := secrets.GetString("table")
-	if !ok {
-		panic("No table name exists")
-	}
-	sql := fmt.Sprintf("select * from %s where id = $1", table)
+	var err error
 
-	rows, err := database.Database.Query(sql, id)
-	if err != nil {
-		log.Fatal(err)
-		return card
-	}
+	sql := ("select * from %s where id = $1")
+	rows := database.GetByQuery(sql, id)
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&card.CardBody, &card.CardType,
+		err = rows.Scan(&card.CardBody, &card.CardType,
 			&card.CardBlanks, &card.Classic, &card.ID)
 
 		if err != nil {
