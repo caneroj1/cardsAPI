@@ -1,40 +1,22 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/caneroj1/cardsAPI/app/models"
 	"github.com/revel/revel"
 )
 
-// Cards is the controller for all card-related operations
+// Cards is the controller that handles requests for non-api card operations
 type Cards struct {
 	*revel.Controller
 }
 
-// Index returns all of the cards
+// Index renders the index page for cards
 func (c Cards) Index() revel.Result {
-	return c.RenderJson(models.GetAllCards())
-}
-
-// Classic returns all of the classic cards
-func (c Cards) Classic() revel.Result {
-	return c.RenderJson(models.GetAllClassicCards())
-}
-
-// Show returns the json for a specific card
-func (c Cards) Show(id int64) revel.Result {
-	return c.RenderJson(models.GetCardByID(id))
-}
-
-// Create allows a card to be POSTed and created
-func (c Cards) Create(cardBody string, cardType, cardBlanks int) revel.Result {
-	models.ValidateCard(c.Validation, cardBody, cardType, cardBlanks)
-	if c.Validation.HasErrors() {
-		c.Validation.Keep()
-		c.Response.Status = 400
-		return c.RenderJson(c.Validation.Errors)
+	if cards, err := json.Marshal(models.GetAllCards()); err == nil {
+		jsonCards := string(cards[:])
+		return c.Render(jsonCards)
 	}
 
-	var card models.Card
-	c.Params.Bind(&card, "card")
-	return c.RenderJson(models.SaveCard(card))
+	return c.Render()
 }

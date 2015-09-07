@@ -1,0 +1,30 @@
+<script type="text/template" id="card-template">
+  <div class="row">
+    <div class="col s12 m12">
+      <div class="card-view">
+        <% if (CardType == 0) { %>
+        <div class="card white-card white">
+        <% } %>
+        <% if (CardType == 1) { %>
+        <div class="card black-card black darken-1">
+        <% } %>
+          <div class="cah-content card-content <%= CardType == 0 ? 'black-text' : 'white-text' %>">
+            <h1 class="cah-face"><%= CardBody %></h1>
+          </div>
+          <div class="card-action cah-footer right-align">
+            <% if (CardBlanks == 3) { %>
+              <a class="cah-black-instr" href="#">Draw<div class="cah-black-circle">2</div></a>
+              <a class="cah-black-instr" href="#">Pick<div class="cah-black-circle">3</div></a>
+            <% } %>
+            <% if (CardBlanks == 2) { %>
+              <a class="cah-black-instr" href="#">Pick<div class="cah-black-circle">2</div></a>
+            <% } %>
+          </div>
+        </div>
+        <h4>Card Rating: </h4>
+        <hr class="card-row">
+        <button class="btn waves-effect waves-light">Rate</button>
+      </div>
+    </div>
+  </div>
+</script>

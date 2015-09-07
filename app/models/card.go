@@ -69,6 +69,35 @@ func GetAllClassicCards() []Card {
 	return cards
 }
 
+// GetAllCreatedCards returns all of the cards in the db that were created by users.
+// e.g. classic = false
+func GetAllCreatedCards() []Card {
+	var cards []Card
+	var err error
+
+	sql := "select * from %s where classic = false"
+	rows := database.GetByQuery(sql)
+	defer rows.Close()
+
+	var card Card
+	for rows.Next() {
+		err = rows.Scan(&card.CardBody, &card.CardType,
+			&card.CardBlanks, &card.Classic, &card.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		cards = append(cards, card)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return cards
+}
+
 // GetAllCards returns all of the cards in the db
 func GetAllCards() []Card {
 	var cards []Card

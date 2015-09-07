@@ -4,11 +4,17 @@
 
 module:testrunner
 
-GET     /                                       App.Index
-GET     /cards                                  Cards.Index
-GET     /cards/classic                          Cards.Classic
-GET     /cards/:id                              Cards.Show
-POST    /card                                   Cards.Create
+GET     /                                           App.Index
+
+# Non-API routes
+GET     /cards                                      Cards.Index
+
+# API Routes
+GET     /api/cards                                  CardsAPI.Index
+GET     /api/cards/classic                          CardsAPI.Classic
+GET     /api/cards/created                          CardsAPI.Created
+GET     /api/cards/:id                              CardsAPI.Show
+POST    /api/cards                                  CardsAPI.Create
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

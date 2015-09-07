@@ -1,22 +1,16 @@
-{{set . "title" "Home"}}
-{{template "header.html" .}}
+{{set . "title" "CAH Online"}}
+{{set . "backbone" ""}}
+{{template "homepage-header.html" .}}
 
-<header class="hero-unit" style="background-color:#A9F16C">
-  <div class="container">
-    <div class="row">
-      <div class="hero-text">
-        <h1>It works!</h1>
-        <p></p>
-      </div>
-    </div>
-  </div>
-</header>
-
-<div class="container">
-  <div class="row">
-    <div class="span6">
-      {{template "flash.html" .}}
-    </div>
+<div class="row">
+  <div class="col s12 center-align text-white">
+    <h1>Cards Against Humanity</h1>
+    <h2>Online</h2>
+    <button class="blue lighten-3 btn waves-effect waves-light">Log In</button>
+    <h4>Or</h4>
+    <button class="blue lighten-3 btn waves-effect waves-light">Create an Account</button>
+    <hr class="spacer">
+    <button class="btn">Log in with Facebook</button>
   </div>
 </div>
 

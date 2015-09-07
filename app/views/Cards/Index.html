@@ -1,0 +1,31 @@
+{{set . "title" "Cards"}}
+{{set . "backbone" "cards"}}
+{{template "header.html" .}}
+
+<div class="row">
+  <div id="cards_container">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3"><a data-classic='-1' id='all-cards' href="">All Cards</a></li>
+        <li class="tab col s3"><a data-classic='0' id='classic-cards' href="">Classic</a></li>
+        <li class="tab col s3"><a data-classic='1' id='user-cards' href="">User Created</a></li>
+        <li class="tab col s3"><a data-classic='2' id='new-cards' href="">New Cards</a></li>
+      </ul>
+      <ul class="tabs">
+        <li class="tab col s4"><a data-color='-1' id='both-cards' href="">Both</a></li>
+        <li class="tab col s4"><a data-color='1' id='black-cards' href="">Black Cards</a></li>
+        <li class="tab col s4"><a data-color='0' id='white-cards' href="">White Cards</a></li>
+      </ul>
+      <div id="cards">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{{template "templates/card_template.html" .}}
+{{template "footer.html" .}}
+
+<script type="text/javascript">
+  Cards.reset(JSON.parse({{.jsonCards}}));
+</script>
