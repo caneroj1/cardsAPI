@@ -9,9 +9,9 @@ import (
 func bindCard(params *revel.Params, name string, typ reflect.Type) reflect.Value {
 	var card models.Card
 	if name == "card" && typ == reflect.TypeOf(card) {
-		params.Bind(&card.CardBody, "cardBody")
-		params.Bind(&card.CardBlanks, "cardBlanks")
-		params.Bind(&card.CardType, "cardType")
+		params.Bind(&card.CardBody, "CardBody")
+		params.Bind(&card.CardBlanks, "CardBlanks")
+		params.Bind(&card.CardType, "CardType")
 
 		return reflect.ValueOf(card)
 	}
@@ -21,9 +21,9 @@ func bindCard(params *revel.Params, name string, typ reflect.Type) reflect.Value
 func unbindCard(output map[string]string, name string, val interface{}) {
 	if name == "card" {
 		card := val.(models.Card)
-		output["cardBody"] = card.CardBody
-		output["cardType"] = string(card.CardType)
-		output["cardBlanks"] = string(card.CardBlanks)
+		output["CardBody"] = card.CardBody
+		output["CardType"] = string(card.CardType)
+		output["CardBlanks"] = string(card.CardBlanks)
 	}
 }
 

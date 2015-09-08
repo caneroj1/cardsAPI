@@ -7,20 +7,25 @@ var Card = Backbone.Model.extend({
     CardBlanks: 0,
     Classic: false,
     ID: 0,
-    visible: 'block'
+    visible: 'block',
+    existingCard: true,
+    noMapBody: false,
   },
 
   initialize: function(attributes) {
-    if (attributes.CardType == 1 && attributes.CardBlanks > 0) {
-      attributes.CardBody = $.map(attributes.CardBody.split(' '),
-      function(val, i) {
-        if (/_[.?!,]?/.test(val))
-          return "______" + val;
-        else
-          return val;
-      }).join(' ');
+    if (attributes.noMapBody) return;
+    else {
+      if (attributes.CardType == 1 && attributes.CardBlanks > 0) {
+        attributes.CardBody = $.map(attributes.CardBody.split(' '),
+        function(val, i) {
+          if (/_+[.?!,]?/.test(val))
+            return "______" + val;
+          else
+            return val;
+        }).join(' ');
+      }
+      this.set({CardBody: attributes.CardBody}, {silent: true});
     }
-    this.set({CardBody: attributes.CardBody}, {silent: true});
   },
 
   validate: function(attributes) {

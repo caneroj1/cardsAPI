@@ -20,3 +20,8 @@ func (c Cards) Index() revel.Result {
 
 	return c.Render()
 }
+
+// New renders the page where users can submit new cards
+func (c Cards) New() revel.Result {
+	return c.Render()
+}

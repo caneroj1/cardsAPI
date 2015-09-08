@@ -1,0 +1,17 @@
+{{set . "title" "New Card"}}
+{{set . "backbone" "new card"}}
+{{template "header.html" .}}
+
+<div class="row">
+  <div id="new-card" class="col s12 center-align">
+    <h3>Submit a Card</h3>
+    <div class="col s12 m6 left-align">
+      {{ template "templates/new_card_template.html" }}
+    </div>
+    <div class="col s12 m6" id="new-card-body">
+    </div>
+  </div>
+</div>
+
+{{ template "templates/card_template.html" }}
+{{ template "footer.html" .}}
