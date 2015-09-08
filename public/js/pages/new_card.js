@@ -33,7 +33,7 @@ var NewCardPageView = Backbone.View.extend({
       noMapBody: true
     });
 
-    Cards.create(newCard);
+    Cards.create(newCard, {emulateJSON: true});
     return false;
   },
 

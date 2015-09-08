@@ -1,7 +1,7 @@
 // Collection of Card Models
 var CardsCollection = Backbone.Collection.extend({
   model: Card,
-  url: '/api/cards',
+  url: 'http://localhost:9000/api/cards',
 });
 
 // create global cards collection

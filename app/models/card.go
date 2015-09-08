@@ -4,6 +4,8 @@ import (
 	"github.com/caneroj1/cardsAPI/app/database"
 	"github.com/revel/revel"
 	"log"
+	"net/url"
+	"strconv"
 )
 
 // Card struct that maps cards in the db to Go struct
@@ -17,12 +19,27 @@ type Card struct {
 
 // ValidateCard validates whether the card's values are appropriate
 // when creating a new card.
-func ValidateCard(validator *revel.Validation, cardBody string, cardType, cardBlanks int) {
+func ValidateCard(validator *revel.Validation, params url.Values) {
+	validator.Clear()
+
+	cardBody := params.Get("CardBody")
+	t, err := strconv.ParseInt(params.Get("CardType"), 0, 0)
+	if err != nil {
+		validator.Error("Card Type should be a number").Key("cardType")
+	}
+	cardType := int(t)
+
+	b, err := strconv.ParseInt(params.Get("CardBlanks"), 0, 0)
+	if err != nil {
+		validator.Error("Card Blanks should be a number").Key("cardBlanks")
+	}
+	cardBlanks := int(b)
+
 	validator.Required(cardBody)
-	validator.Range(cardType, 0, 1).Message("The card type can only be 0 for a white card, or 1 for a black card.")
-	validator.Min(cardBlanks, 0).Message("Card blank cannot be negative.")
+	validator.Range(int(cardType), 0, 1).Message("The card type can only be 0 for a white card, or 1 for a black card.")
+	validator.Min(int(cardBlanks), 0).Message("Card blank cannot be negative.")
 	if cardType == 0 {
-		validator.Max(cardBlanks, 0).Message("You cannot have blank spaces in a card unless it is a black card (type = 1)")
+		validator.Max(int(cardBlanks), 0).Message("You cannot have blank spaces in a card unless it is a black card (type = 1)")
 	}
 }
 

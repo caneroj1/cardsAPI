@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/caneroj1/cardsAPI/app/models"
 	"github.com/revel/revel"
 )
@@ -33,7 +32,7 @@ func (c CardsAPI) Show(id int64) revel.Result {
 
 // Create allows a card to be POSTed and created
 func (c CardsAPI) Create(CardBody string, CardType, CardBlanks int) revel.Result {
-	models.ValidateCard(c.Validation, CardBody, CardType, CardBlanks)
+	models.ValidateCard(c.Validation, c.Params.Form)
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
 		c.Response.Status = 400
