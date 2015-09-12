@@ -8,6 +8,7 @@ var CardView = Backbone.View.extend({
     // 'dblclick label': 'edit',
     // 'keypress .edit': 'updateOnEnter',
     // 'blur .edit':   'close'
+    'click .card': 'show'
   },
 
   // Called when the view is first created
@@ -28,6 +29,13 @@ var CardView = Backbone.View.extend({
       this.$el.html('');
     return this;
   },
+
+  show: function(env) {
+    if (this.model.attributes.existingCard) {
+      var id = $(env.currentTarget).data('id');
+      location = "cards/" + id;  
+    }
+  }
 
   // edit: function() {
     // executed when card label is double clicked

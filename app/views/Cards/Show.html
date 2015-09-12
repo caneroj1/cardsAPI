@@ -1,11 +1,29 @@
 {{set . "title" "Cards"}}
-{{set . "backbone" "cards"}}
+{{set . "backbone" "card"}}
 {{template "header.html" .}}
+
 <div class="row">
-  <div class="col s12 center-align">{{.card.CardBody}}</div>
-  <script type="text/javascript">
-  console.log(JSON.parse({{.jsonCard}}));
-  </script>
+  <div class="col s12"  id="show-card">
+    <div id="info">
+
+    </div>
+    <div class="col s12 m5" id="card">
+
+    </div>
+
+    <div class="col s12" id="comments">
+
+    </div>
+  </div>
 </div>
+
+{{template "templates/card_comments_template.html" .}}
+{{template "templates/show_card_template.html" .}}
 {{template "templates/card_template.html" .}}
 {{template "footer.html" .}}
+
+<script type="text/javascript">
+  var card = new Card(JSON.parse({{.jsonCard}}));
+  var mainView = new ShowCardPageView(card);
+  mainView.render();
+</script>

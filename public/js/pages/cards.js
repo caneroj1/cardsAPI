@@ -16,6 +16,7 @@ var CardsPageView = Backbone.View.extend({
     'click #both-cards':    'filterByColor',
     'click #black-cards':   'filterByColor',
     'click #white-cards':   'filterByColor',
+    'click #back-to-top':   'backToTop',
   },
 
   addOne: function(card) {
@@ -44,6 +45,10 @@ var CardsPageView = Backbone.View.extend({
     Cards.models.forEach(function(card){
       card.filter(type, color);
     })
+  },
+
+  backToTop: function() {
+    $('html,body').animate({ scrollTop: 0 }, 'slow');
   },
 });
 

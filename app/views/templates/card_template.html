@@ -3,10 +3,10 @@
     <div class="col s12 m12 left-align">
       <div class="card-view">
         <% if (CardType == 0) { %>
-        <div class="card white-card white">
+        <div class="card white-card white" data-id="<%= ID %>">
         <% } %>
         <% if (CardType == 1) { %>
-        <div class="card black-card black darken-1">
+        <div class="card black-card black darken-1" data-id="<%= ID %>">
         <% } %>
           <div class="cah-content card-content <%= CardType == 0 ? 'black-text' : 'white-text' %>">
             <h1 class="cah-face"><%= CardBody %></h1>
