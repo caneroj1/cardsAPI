@@ -37,9 +37,9 @@ func ValidateCard(validator *revel.Validation, params url.Values) {
 
 	validator.Required(cardBody)
 	validator.Range(int(cardType), 0, 1).Message("The card type can only be 0 for a white card, or 1 for a black card.")
-	validator.Min(int(cardBlanks), 0).Message("Card blank cannot be negative.")
+	validator.Range(int(cardBlanks), 0, 3).Message("Card blanks must be in the range of 0 - 3.")
 	if cardType == 0 {
-		validator.Max(int(cardBlanks), 0).Message("You cannot have blank spaces in a card unless it is a black card (type = 1)")
+		validator.Max(int(cardBlanks), 0).Message("You cannot have blank spaces in a card unless it is a black card.)")
 	}
 }
 

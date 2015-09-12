@@ -1,0 +1,11 @@
+{{set . "title" "Cards"}}
+{{set . "backbone" "cards"}}
+{{template "header.html" .}}
+<div class="row">
+  <div class="col s12 center-align">{{.card.CardBody}}</div>
+  <script type="text/javascript">
+  console.log(JSON.parse({{.jsonCard}}));
+  </script>
+</div>
+{{template "templates/card_template.html" .}}
+{{template "footer.html" .}}

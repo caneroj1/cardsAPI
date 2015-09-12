@@ -3,6 +3,7 @@ var NewCardPageView = Backbone.View.extend({
   cardView: new CardView(),
   color: 0,
   blanks: 0,
+  failColor: "#ef5350",
 
   events: {
     'submit #new-card-form':  'submitCard',
@@ -19,8 +20,15 @@ var NewCardPageView = Backbone.View.extend({
   },
 
   submitted: function(card) {
-    console.log("Created card");
-    console.log(card);
+    if (!card.isValid())
+      this.handleErrors(card.validationError)
+    else {
+      console.log("SUCCESS SUBMIT");
+    }
+  },
+
+  handleErrors: function(err) {
+    this.$('#fails').html(err).css('color', this.failColor);
   },
 
   submitCard: function() {
@@ -35,7 +43,10 @@ var NewCardPageView = Backbone.View.extend({
       noMapBody: true
     });
 
-    Cards.create(newCard, {emulateJSON: true});
+    if (newCard.isValid())
+      Cards.create(newCard, {emulateJSON: true});
+    else
+      this.handleErrors(newCard.validationError);
     return false;
   },
 
@@ -43,18 +54,19 @@ var NewCardPageView = Backbone.View.extend({
     if (this.color === 0) {
       var body = this.$('#cardBody').val();
       if (body.indexOf("_") >= 0)
-        this.$('#blanks-counter').html("No underscores allowed.").css("color", "#ef5350");
+        this.$('#blanks-counter').html("No underscores allowed.").css("color", this.failColor);
       else
         this.$('#blanks-counter').html("").css("color", "black");
       this.$('.cah-face').html(body);
     }
     else {
       var tBlanks = 0;
+      var tFailColor = this.failColor;
       var body = $.map(this.$('#cardBody').val().split(' '),
       function(val, i) {
         if (/_+[.?!,]?/.test(val)) {
           tBlanks += 1;
-          if (tBlanks > 3) this.$('#blanks-counter').css("color", "#ef5350");
+          if (tBlanks > 3) this.$('#blanks-counter').css("color", tFailColor);
           else this.$('#blanks-counter').css("color", "black");
           this.$('#blanks-counter').html("Blanks: " + tBlanks + "/3");
           return "______" + val;
@@ -62,6 +74,9 @@ var NewCardPageView = Backbone.View.extend({
         else
           return val;
       }).join(' ');
+      if (tBlanks == 0)
+        this.$('#blanks-counter').css("color", "black");
+      this.$('#blanks-counter').html("Blanks: " + tBlanks + "/3");
       this.$('.cah-face').html(body);
       cardView = new CardView({ model: new Card({existingCard: false, CardType: this.color, CardBody: body, CardBlanks: tBlanks}) });
       this.$('#new-card-body').html(cardView.render().el);
@@ -69,14 +84,16 @@ var NewCardPageView = Backbone.View.extend({
   },
 
   changeCard: function(env) {
+    this.$('#fails').html('');
     var color = $(env.currentTarget).data('color');
     this.color = color;
     var tBlanks = 0;
+    var tFailColor = this.failColor;
     var body = $.map(this.$('#cardBody').val().split(' '),
     function(val, i) {
       if (color === 1 && /_+[.?!,]?/.test(val)) {
         tBlanks++;
-        if (tBlanks > 3) this.$('#blanks-counter').css("color", "#ef5350");
+        if (tBlanks > 3) this.$('#blanks-counter').css("color", tFailColor);
         else this.$('#blanks-counter').css("color", "black");
         this.$('#blanks-counter').html("Blanks: " + tBlanks + "/3");
         return "______" + val;
@@ -88,12 +105,12 @@ var NewCardPageView = Backbone.View.extend({
 
     if (color === 0) {
       if (body.indexOf("_") >= 0)
-        this.$('#blanks-counter').html("No underscores allowed.").css("color", "#ef5350");
+        this.$('#blanks-counter').html("No underscores allowed.").css("color", this.failColor);
       else
         this.$('#blanks-counter').html("").css("color", "black");
     }
     else {
-      if (tBlanks > 3) this.$('#blanks-counter').css("color", "#ef5350");
+      if (tBlanks > 3) this.$('#blanks-counter').css("color", this.failColor);
       else this.$('#blanks-counter').css("color", "black");
     }
 

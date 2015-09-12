@@ -9,6 +9,7 @@ GET     /                                           App.Index
 # Non-API routes
 GET     /cards                                      Cards.Index
 GET     /cards/new                                  Cards.New
+GET     /cards/:id                                  Cards.Show
 
 # API Routes
 GET     /api/cards                                  CardsAPI.Index

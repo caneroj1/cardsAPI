@@ -33,12 +33,16 @@ var Card = Backbone.Model.extend({
       return "The card body is required.";
     if (attributes.CardType > 1 || attributes.CardType < 0)
       return "The card type can only be 0, for white cards, or 1, for black cards.";
-    if (attributes.CardType == 1)
-      if (attributes.CardBlanks < 0)
-        return "The number of blanks cannot be negative.";
-    else
-      if (attributes.CardBlanks != 0)
+    if (attributes.CardType == 1) {
+      if (attributes.CardBlanks < 0 || attributes.CardBlanks > 3) {
+        return "The number of blanks must be in the range of 0 - 3.";
+      }
+    }
+    else {
+      if (attributes.CardBlanks != 0) {
         return "There cannot be blanks on a white card.";
+      }
+    }
   },
 
   filter: function(classic, color) {

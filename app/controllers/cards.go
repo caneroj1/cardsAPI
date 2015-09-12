@@ -25,3 +25,13 @@ func (c Cards) Index() revel.Result {
 func (c Cards) New() revel.Result {
 	return c.Render()
 }
+
+// Show renders the page where users can see a specific card
+func (c Cards) Show(id int64) revel.Result {
+	if card, err := json.Marshal(models.GetCardByID(id)); err == nil {
+		jsonCard := string(card[:])
+		return c.Render(jsonCard)
+	}
+
+	return c.Render()
+}

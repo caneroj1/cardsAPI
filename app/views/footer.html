@@ -6,17 +6,17 @@
   <script src="/public/js/lib/materialize.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/public/js/lib/underscore-min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/public/js/lib/backbone.js" type="text/javascript" charset="utf-8"></script>
-  {{if eq .backbone "cards"}}
+  {{if eq .backbone "cards" "new card" "card" }}
     <script src="/public/js/models/card_model.js"></script>
     <script src="/public/js/collections/cards.js"></script>
     <script src="/public/js/views/card_view.js"></script>
+  {{end}}
+
+  {{if eq .backbone "cards"}}
     <script src="/public/js/pages/cards.js"></script>
   {{end}}
 
-  {{ if eq .backbone "new card"}}
-    <script src="/public/js/models/card_model.js"></script>
-    <script src="/public/js/collections/cards.js"></script>
-    <script src="/public/js/views/card_view.js"></script>
+  {{if eq .backbone "new card"}}
     <script src="/public/js/pages/new_card.js"></script>
   {{end}}
   </body>
