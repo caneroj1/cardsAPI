@@ -2,6 +2,8 @@ package tests
 
 import "github.com/revel/revel/testing"
 
+var contentType = "application/json; charset=utf-8"
+
 // CardsTest encapsulates testing functionaltiy for the cards controller
 type CardsTest struct {
 	testing.TestSuite
@@ -12,23 +14,23 @@ func (t *CardsTest) Before() {
 	println("Set up")
 }
 
-// TestThatIndexPageWorks checks to see if the response is json
+// TestThatIndexRouteWorks checks to see if the response is json
 // and that there is a response body
-func (t *CardsTest) TestThatIndexPageWorks() {
+func (t *CardsTest) TestThatIndexRouteWorks() {
 	t.Get("/cards")
 	t.AssertOk()
-	t.AssertContentType("application/json; charset=utf-8")
+	t.AssertContentType(contentType)
 	cards := getCardsFromResponse(t.ResponseBody)
 	t.Assert(len(cards) > 0)
 	t.AssertStatus(200)
 }
 
-// TestThatClassicPageWorks checks to see if the response is json
+// TestThatClassicRouteWorks checks to see if the response is json
 // and that there is a response body
-func (t *CardsTest) TestThatClassicPageWorks() {
+func (t *CardsTest) TestThatClassicRouteWorks() {
 	t.Get("/cards/classic")
 	t.AssertOk()
-	t.AssertContentType("application/json; charset=utf-8")
+	t.AssertContentType(contentType)
 	cards := getCardsFromResponse(t.ResponseBody)
 	t.Assert(len(cards) > 0)
 
@@ -39,12 +41,44 @@ func (t *CardsTest) TestThatClassicPageWorks() {
 	t.AssertStatus(200)
 }
 
-// TestThatShowPageWorks checks to see if the response from the show
+// TestThatCreatedRouteWorks checks to see if the response is json,
+// that there is a response body, and that all the cards meet the criteria
+// of a created card
+func (t *CardsTest) TestThatCreatedRouteWorks() {
+	t.Get("/cards/created")
+	t.AssertOk()
+	t.AssertContentType(contentType)
+	cards := getCardsFromResponse(t.ResponseBody)
+	if len(cards) > 0 {
+		for _, card := range cards {
+			t.Assert(card.Approved)
+			t.Assert(!card.Classic)
+		}
+	}
+}
+
+// TestThatNewRouteWorks checks to see if the response is json,
+// that there is a response body, and that all the cards meet the criteria
+// of a new card
+func (t *CardsTest) TestThatNewRouteWorks() {
+	t.Get("/cards/new")
+	t.AssertOk()
+	t.AssertContentType(contentType)
+	cards := getCardsFromResponse(t.ResponseBody)
+	if len(cards) > 0 {
+		for _, card := range cards {
+			t.Assert(!card.Approved)
+			t.Assert(!card.Classic)
+		}
+	}
+}
+
+// TestThatShowRouteWorks checks to see if the response from the show
 // page is a json card
-func (t *CardsTest) TestThatShowPageWorks() {
+func (t *CardsTest) TestThatShowRouteWorks() {
 	t.Get("/cards/1")
 	t.AssertOk()
-	t.AssertContentType("application/json; charset=utf-8")
+	t.AssertContentType(contentType)
 	card := getCardFromResponse(t.ResponseBody)
 	t.Assert(card.CardBody != "")
 	t.AssertStatus(200)
