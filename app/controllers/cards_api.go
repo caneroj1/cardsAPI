@@ -30,22 +30,20 @@ func (c CardsAPI) Show(id int64) revel.Result {
 	return c.RenderJson(models.GetCardByID(id))
 }
 
-// Rate accepts the current number of raters of a card, the card's id, its old rating,
-// and the new rating that is being assigned to it and returns the updated version of all
-// of these attributes, minus the ID.
-func (c CardsAPI) Rate(NewRating, Raters, ID int, OldRating float32) revel.Result {
-	newestRating, numberRaters := models.RateCard(NewRating, Raters, ID, OldRating)
+// Rate accepts the new rating for a card and updates it in the db.
+// The method returns the new rating.
+func (c CardsAPI) Rate(NewRating, ID, RaterID int) revel.Result {
+	newestRating := models.RateCard(NewRating, ID, RaterID)
 	type ratingResponse struct {
 		Rating float32
-		Raters int
+	}
+	if newestRating < 0 {
+		c.Response.Status = 500
+	} else {
+		c.Response.Status = 201
 	}
 
-	resp := ratingResponse{
-		newestRating,
-		numberRaters,
-	}
-
-	return c.RenderJson(resp)
+	return c.RenderJson(ratingResponse{newestRating})
 }
 
 // Create allows a card to be POSTed and created
@@ -59,5 +57,11 @@ func (c CardsAPI) Create(CardBody string, CardType, CardBlanks int) revel.Result
 
 	var card models.Card
 	c.Params.Bind(&card, "card")
-	return c.RenderJson(models.SaveCard(card))
+	savedCard := models.SaveCard(card)
+	if savedCard.ID < 1 {
+		c.Response.Status = 500
+	} else {
+		c.Response.Status = 201
+	}
+	return c.RenderJson(savedCard)
 }

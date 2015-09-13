@@ -50,10 +50,10 @@ func ValidateCard(validator *revel.Validation, params url.Values) {
 
 // SaveCard saves a card to the database and sets its id
 func SaveCard(card Card) Card {
-	sql := "insert into %s (cardbody, cardtype, cardblanks) VALUES ($1, $2, $3) returning id"
+	sql := "insert into %s (cardbody, cardtype, cardblanks) VALUES ($1, $2, $3) returning id, createdon"
 	var id int64
 
-	err := database.QueryRow(sql, card.CardBody, card.CardType, card.CardBlanks).Scan(&id)
+	err := database.QueryRow(sql, card.CardBody, card.CardType, card.CardBlanks).Scan(&id, &card.CreatedOn)
 	if err != nil {
 		log.Fatal(err)
 		return card
@@ -68,7 +68,7 @@ func GetAllClassicCards() []Card {
 	var cards []Card
 	var err error
 
-	sql := "select cardbody, cardtype, cardblanks, classic, id, createdon from %s where classic = true"
+	sql := "select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters from %s where classic = true"
 	rows := database.GetByQuery(sql)
 	defer rows.Close()
 
@@ -177,13 +177,23 @@ func GetCardByID(id int64) Card {
 	return card
 }
 
-// RateCard changes the card's rating and returns the new rating and the new number
-// of raters
-func RateCard(newRating, raters, ID int, oldRating float32) (float32, int) {
-	ratingToAssign := ((oldRating*float32(raters) + float32(newRating)) / float32(raters+1))
-	newRaters := raters + 1
-	sql := ("update %s set rating = $1, raters = $2 where id = $3")
-	database.QueryRow(sql, ratingToAssign, newRaters, ID)
+// RateCard changes the card's rating and returns the new rating.
+// The modifiedon timestamo and the modifiedby field will be updated appropriately.
+// TODO: once a user system is in place, add this rating to the user's list of rated cards.
+func RateCard(newRating, ID, raterID int) float32 {
+	sql := `update %s set
+	rating = ((rating * raters + $1) / (raters + 1)),
+	raters = raters + 1,
+	modifiedon = current_timestamp,
+	modifiedby = $2
+	where
+	id = $3
+	returning rating`
+	var cardRating float32
+	if err := database.QueryRow(sql, newRating, raterID, ID).Scan(&cardRating); err != nil {
+		log.Fatal(err)
+		return -1
+	}
 
-	return ratingToAssign, newRaters
+	return cardRating
 }
