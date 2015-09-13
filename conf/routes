@@ -15,6 +15,7 @@ GET     /cards/:id                                  Cards.Show
 GET     /api/cards                                  CardsAPI.Index
 GET     /api/cards/classic                          CardsAPI.Classic
 GET     /api/cards/created                          CardsAPI.Created
+GET     /api/cards/new                              CardsAPI.New
 GET     /api/cards/:id                              CardsAPI.Show
 POST    /api/cards                                  CardsAPI.Create
 POST    /api/cards/:id/rate                         CardsAPI.Rate

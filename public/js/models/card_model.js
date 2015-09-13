@@ -8,6 +8,10 @@ var Card = Backbone.Model.extend({
     Classic: false,
     CreatedOn: null,
     ModifiedOn: null,
+    CreatorID: 0,
+    Approved: false,
+    Raters: 0,
+    Rating: 0.0,
     ID: 0,
     visible: 'block',
     existingCard: true,
@@ -31,6 +35,8 @@ var Card = Backbone.Model.extend({
   },
 
   validate: function(attributes) {
+    if (attributes.CreatorID < 1)
+      return "The card must have a valid user ID."
     if (attributes.CardBody === undefined || attributes.CardBody === "")
       return "The card body is required.";
     if (attributes.CardType > 1 || attributes.CardType < 0)
@@ -54,13 +60,13 @@ var Card = Backbone.Model.extend({
         result = true;
         break;
       case 0:
-        result = this.get('Classic') === true;
+        result = this.get('Classic');
         break;
       case 1:
-        result = this.get('Classic') === false;
+        result = !this.get('Classic') && this.get('Approved');
         break;
       case 2:
-        result = false;
+        result = !this.get('Classic') && !this.get('Approved');
         break;
     }
 

@@ -40,6 +40,7 @@ var NewCardPageView = Backbone.View.extend({
       CardType: this.color,
       CardBody: this.$('#cardBody').val(),
       CardBlanks: blanks,
+      CreatorID: 1, // TODO: USE THE USER ID OF THE SIGNED IN USER
       noMapBody: true
     });
 

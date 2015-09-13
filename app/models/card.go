@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"github.com/caneroj1/cardsAPI/app/database"
 	"github.com/revel/revel"
 	"log"
@@ -18,6 +19,8 @@ type Card struct {
 	ID         int64
 	Raters     int
 	Rating     float32
+	Approved   bool
+	CreatedBy  int64
 	CreatedOn  time.Time
 	ModifiedOn time.Time
 }
@@ -26,6 +29,12 @@ type Card struct {
 // when creating a new card.
 func ValidateCard(validator *revel.Validation, params url.Values) {
 	validator.Clear()
+
+	id, err := strconv.ParseInt(params.Get("CreatorID"), 0, 0)
+	if err != nil {
+		validator.Error("The ID of the creator should be a number").Key("creatorID")
+	}
+	creatorID := int(id)
 
 	cardBody := params.Get("CardBody")
 	t, err := strconv.ParseInt(params.Get("CardType"), 0, 0)
@@ -46,37 +55,45 @@ func ValidateCard(validator *revel.Validation, params url.Values) {
 	if cardType == 0 {
 		validator.Max(int(cardBlanks), 0).Message("You cannot have blank spaces in a card unless it is a black card.)")
 	}
+	validator.Min(creatorID, 0).Message("The creator ID must be greater than 0.")
 }
 
 // SaveCard saves a card to the database and sets its id
-func SaveCard(card Card) Card {
-	sql := "insert into %s (cardbody, cardtype, cardblanks) VALUES ($1, $2, $3) returning id, createdon"
+func SaveCard(card Card, creator int) Card {
+	sql := "insert into %s (cardbody, cardtype, cardblanks, createdby) VALUES ($1, $2, $3, $4) returning id, createdon"
 	var id int64
 
-	err := database.QueryRow(sql, card.CardBody, card.CardType, card.CardBlanks).Scan(&id, &card.CreatedOn)
+	err := database.QueryRow(sql, card.CardBody, card.CardType, card.CardBlanks, creator).Scan(&id, &card.CreatedOn)
 	if err != nil {
 		log.Fatal(err)
 		return card
 	}
 
 	card.ID = id
+	card.CreatedBy = int64(creator)
 	return card
 }
 
-// GetAllClassicCards returns all of the classic cards in the db
-func GetAllClassicCards() []Card {
+// getCardsWithWhereQuery returns all of the cards that match a certain WHERE query.
+func getCardsWithWhereQuery(query string, params ...interface{}) []Card {
 	var cards []Card
 	var err error
 
-	sql := "select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters from %s where classic = true"
-	rows := database.GetByQuery(sql)
+	sqlQ := "select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters, approved, createdby from %s " + query
+	var rows *sql.Rows
+	if len(params) == 0 {
+		rows = database.GetByQuery(sqlQ)
+	} else {
+		rows = database.GetByQuery(sqlQ, params...)
+	}
 	defer rows.Close()
 
 	var card Card
 	for rows.Next() {
 		err = rows.Scan(&card.CardBody, &card.CardType,
 			&card.CardBlanks, &card.Classic, &card.ID,
-			&card.CreatedOn, &card.Rating, &card.Raters)
+			&card.CreatedOn, &card.Rating, &card.Raters,
+			&card.Approved, &card.CreatedBy)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -92,89 +109,40 @@ func GetAllClassicCards() []Card {
 	return cards
 }
 
-// GetAllCreatedCards returns all of the cards in the db that were created by users.
+// GetAllCreatedCards returns all of the cards in the db that were created by users and were approved.
 // e.g. classic = false
 func GetAllCreatedCards() []Card {
-	var cards []Card
-	var err error
+	query := "where classic = false and approved = true"
+	cards := getCardsWithWhereQuery(query)
+	return cards
+}
 
-	sql := "select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters from %s where classic = false"
-	rows := database.GetByQuery(sql)
-	defer rows.Close()
+// GetAllClassicCards returns all of the classic cards in the db
+func GetAllClassicCards() []Card {
+	query := "where classic = true"
+	cards := getCardsWithWhereQuery(query)
+	return cards
+}
 
-	var card Card
-	for rows.Next() {
-		err = rows.Scan(&card.CardBody, &card.CardType,
-			&card.CardBlanks, &card.Classic, &card.ID,
-			&card.CreatedOn, &card.Rating, &card.Raters)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		cards = append(cards, card)
-	}
-
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+// GetAllNewCards returns all of the cards that were created by users and were not approved
+func GetAllNewCards() []Card {
+	query := "where classic = false and approved = false"
+	cards := getCardsWithWhereQuery(query)
 	return cards
 }
 
 // GetAllCards returns all of the cards in the db
 func GetAllCards() []Card {
-	var cards []Card
-	var err error
-
-	sql := "select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters from %s"
-	rows := database.GetByQuery(sql)
-	defer rows.Close()
-
-	var card Card
-	for rows.Next() {
-		err = rows.Scan(&card.CardBody, &card.CardType,
-			&card.CardBlanks, &card.Classic, &card.ID,
-			&card.CreatedOn, &card.Rating, &card.Raters)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		cards = append(cards, card)
-	}
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	query := "where 1 = 1"
+	cards := getCardsWithWhereQuery(query)
 	return cards
 }
 
 // GetCardByID gets the cards from the db by id
 func GetCardByID(id int64) Card {
-	var card Card
-	var err error
-
-	sql := ("select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters from %s where id = $1")
-	rows := database.GetByQuery(sql, id)
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(&card.CardBody, &card.CardType,
-			&card.CardBlanks, &card.Classic, &card.ID,
-			&card.CreatedOn, &card.Rating, &card.Raters)
-
-		if err != nil {
-			log.Fatal(err)
-			return card
-		}
-	}
-
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return card
+	query := "where id = $1"
+	cards := getCardsWithWhereQuery(query, id)
+	return cards[0]
 }
 
 // RateCard changes the card's rating and returns the new rating.

@@ -20,6 +20,11 @@ func (c CardsAPI) Classic() revel.Result {
 	return c.RenderJson(models.GetAllClassicCards())
 }
 
+// New returns all of the cards that were created by users that were not approved yet
+func (c CardsAPI) New() revel.Result {
+	return c.RenderJson(models.GetAllNewCards())
+}
+
 // Created returns all of the cards that were created by users
 func (c CardsAPI) Created() revel.Result {
 	return c.RenderJson(models.GetAllCreatedCards())
@@ -47,7 +52,7 @@ func (c CardsAPI) Rate(NewRating, ID, RaterID int) revel.Result {
 }
 
 // Create allows a card to be POSTed and created
-func (c CardsAPI) Create(CardBody string, CardType, CardBlanks int) revel.Result {
+func (c CardsAPI) Create(CardBody string, CardType, CardBlanks, CreatorID int) revel.Result {
 	models.ValidateCard(c.Validation, c.Params.Form)
 	if c.Validation.HasErrors() {
 		c.Validation.Keep()
@@ -57,7 +62,7 @@ func (c CardsAPI) Create(CardBody string, CardType, CardBlanks int) revel.Result
 
 	var card models.Card
 	c.Params.Bind(&card, "card")
-	savedCard := models.SaveCard(card)
+	savedCard := models.SaveCard(card, CreatorID)
 	if savedCard.ID < 1 {
 		c.Response.Status = 500
 	} else {
