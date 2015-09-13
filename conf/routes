@@ -17,6 +17,7 @@ GET     /api/cards/classic                          CardsAPI.Classic
 GET     /api/cards/created                          CardsAPI.Created
 GET     /api/cards/:id                              CardsAPI.Show
 POST    /api/cards                                  CardsAPI.Create
+POST    /api/cards/:id/rate                         CardsAPI.Rate
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

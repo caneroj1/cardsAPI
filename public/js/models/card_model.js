@@ -6,6 +6,8 @@ var Card = Backbone.Model.extend({
     CardType: 0,
     CardBlanks: 0,
     Classic: false,
+    CreatedOn: null,
+    ModifiedOn: null,
     ID: 0,
     visible: 'block',
     existingCard: true,

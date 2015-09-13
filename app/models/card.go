@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 // Card struct that maps cards in the db to Go struct
@@ -15,6 +16,10 @@ type Card struct {
 	CardType   int
 	Classic    bool
 	ID         int64
+	Raters     int
+	Rating     float32
+	CreatedOn  time.Time
+	ModifiedOn time.Time
 }
 
 // ValidateCard validates whether the card's values are appropriate
@@ -63,14 +68,15 @@ func GetAllClassicCards() []Card {
 	var cards []Card
 	var err error
 
-	sql := "select * from %s where classic = true"
+	sql := "select cardbody, cardtype, cardblanks, classic, id, createdon from %s where classic = true"
 	rows := database.GetByQuery(sql)
 	defer rows.Close()
 
 	var card Card
 	for rows.Next() {
 		err = rows.Scan(&card.CardBody, &card.CardType,
-			&card.CardBlanks, &card.Classic, &card.ID)
+			&card.CardBlanks, &card.Classic, &card.ID,
+			&card.CreatedOn, &card.Rating, &card.Raters)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -92,14 +98,15 @@ func GetAllCreatedCards() []Card {
 	var cards []Card
 	var err error
 
-	sql := "select * from %s where classic = false"
+	sql := "select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters from %s where classic = false"
 	rows := database.GetByQuery(sql)
 	defer rows.Close()
 
 	var card Card
 	for rows.Next() {
 		err = rows.Scan(&card.CardBody, &card.CardType,
-			&card.CardBlanks, &card.Classic, &card.ID)
+			&card.CardBlanks, &card.Classic, &card.ID,
+			&card.CreatedOn, &card.Rating, &card.Raters)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -120,14 +127,15 @@ func GetAllCards() []Card {
 	var cards []Card
 	var err error
 
-	sql := "select * from %s"
+	sql := "select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters from %s"
 	rows := database.GetByQuery(sql)
 	defer rows.Close()
 
 	var card Card
 	for rows.Next() {
 		err = rows.Scan(&card.CardBody, &card.CardType,
-			&card.CardBlanks, &card.Classic, &card.ID)
+			&card.CardBlanks, &card.Classic, &card.ID,
+			&card.CreatedOn, &card.Rating, &card.Raters)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -147,13 +155,14 @@ func GetCardByID(id int64) Card {
 	var card Card
 	var err error
 
-	sql := ("select * from %s where id = $1")
+	sql := ("select cardbody, cardtype, cardblanks, classic, id, createdon, rating, raters from %s where id = $1")
 	rows := database.GetByQuery(sql, id)
 	defer rows.Close()
 
 	for rows.Next() {
 		err = rows.Scan(&card.CardBody, &card.CardType,
-			&card.CardBlanks, &card.Classic, &card.ID)
+			&card.CardBlanks, &card.Classic, &card.ID,
+			&card.CreatedOn, &card.Rating, &card.Raters)
 
 		if err != nil {
 			log.Fatal(err)
@@ -166,4 +175,15 @@ func GetCardByID(id int64) Card {
 		log.Fatal(err)
 	}
 	return card
+}
+
+// RateCard changes the card's rating and returns the new rating and the new number
+// of raters
+func RateCard(newRating, raters, ID int, oldRating float32) (float32, int) {
+	ratingToAssign := ((oldRating*float32(raters) + float32(newRating)) / float32(raters+1))
+	newRaters := raters + 1
+	sql := ("update %s set rating = $1, raters = $2 where id = $3")
+	database.QueryRow(sql, ratingToAssign, newRaters, ID)
+
+	return ratingToAssign, newRaters
 }

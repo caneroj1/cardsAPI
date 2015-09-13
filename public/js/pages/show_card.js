@@ -8,7 +8,7 @@ var ShowCardPageView = Backbone.View.extend({
     this.model = card;
     this.model.set({ existingCard: false })
     this.$('#card').html(new CardView( { model: this.model }).render().el );
-    // this.$('#comments').html(new CardCommentsView( { model: {} }).render().el );
+    this.$('#comments').html(new CardCommentsView( { model: {} }).render().el );
   },
 
   render: function() {

@@ -6,8 +6,11 @@
       <h3>Rating: </h3>
       <button class="blue lighten-3 btn waves-effect waves-light">Rate</button>
       <% if (!Classic) { %>
-        <h4>Created: </h4>
-        <h4>Created by:</h4>
+        <h4>Created </h4>
+        <% var date = new Date(CreatedOn) %>
+        <h5><%=  hours + " on " + date.toLocaleDateString() %></h5>
+        <h4>Created by</h4>
+        <h5>Joe Canero</h5>
       <% } %>
     </div>
   </div>
