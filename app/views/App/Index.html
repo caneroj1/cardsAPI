@@ -6,12 +6,19 @@
   <div class="col s12 center-align text-white">
     <h1>Cards Against Humanity</h1>
     <h2>Online</h2>
-    <button class="blue lighten-3 btn waves-effect waves-light">Log In</button>
+    <button class="blue lighten-3 btn waves-effect waves-light modal-trigger" data-target="login-modal">Log In</button>
     <h4>Or</h4>
-    <button class="blue lighten-3 btn waves-effect waves-light">Create an Account</button>
+    <button class="blue lighten-3 btn waves-effect waves-light modal-trigger" data-target="signup-modal">Create an Account</button>
     <hr class="spacer">
     <button class="btn">Log in with Facebook</button>
   </div>
 </div>
 
+{{template "login-modal.html" .}}
+{{template "signup-modal.html" .}}
 {{template "footer.html" .}}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('.modal-trigger').leanModal();
+  });
+</script>

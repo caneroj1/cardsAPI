@@ -1,7 +1,4 @@
   </div>
-  {{if eq .RunMode "dev"}}
-    {{template "debug.html" .}}
-  {{end}}
   <script src="/public/js/lib/jquery-2.1.4.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/public/js/lib/materialize.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/public/js/lib/underscore-min.js" type="text/javascript" charset="utf-8"></script>
@@ -23,6 +20,10 @@
   {{if eq .backbone "card"}}
     <script src="/public/js/views/card_comments_view.js"></script>
     <script src="/public/js/pages/show_card.js"></script>
+  {{end}}
+  
+  {{if eq .RunMode "dev"}}
+    {{template "debug.html" .}}
   {{end}}
   </body>
 </html>
